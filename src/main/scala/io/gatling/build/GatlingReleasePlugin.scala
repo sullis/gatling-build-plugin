@@ -3,7 +3,7 @@ package io.gatling.build
 import com.jsuereth.sbtpgp.PgpKeys.publishSigned
 import sbt.Keys._
 import sbt._
-import _root_.io.gatling.build.Milestone._
+import _root_.io.gatling.build.publish.GatlingVersion._
 import sbt.complete.DefaultParsers._
 import sbt.complete.Parser
 import sbtrelease.ReleasePlugin.autoImport._

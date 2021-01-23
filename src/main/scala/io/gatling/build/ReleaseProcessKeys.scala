@@ -1,7 +1,7 @@
 package io.gatling.build
 
 import _root_.io.gatling.build.GatlingReleasePlugin.autoimport._
-import _root_.io.gatling.build.Milestone._
+import io.gatling.build.publish.GatlingVersion._
 import io.gatling.build.MavenPublishKeys.pushToPrivateNexus
 import sbt.Keys._
 import sbt._

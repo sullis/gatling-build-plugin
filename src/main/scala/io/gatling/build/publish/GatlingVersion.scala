@@ -1,20 +1,18 @@
-package io.gatling.build
-
-import java.text.SimpleDateFormat
-import java.util.Date
+package io.gatling.build.publish
 
 import sbtrelease.Version
 
-import scala.language.implicitConversions
+import java.text.SimpleDateFormat
+import java.util.Date
 import scala.util.Try
 
-object Milestone {
+object GatlingVersion {
 
   lazy val MilestoneQualifierPrefix = "-M"
   lazy val MilestoneFormatterPattern = "yyyyMMddhhmmss"
   lazy val MilestoneFormatter = new SimpleDateFormat(MilestoneFormatterPattern)
 
-  implicit class MilestoneVersion(version: Version) {
+  implicit class GatlingVersion(version: Version) {
     def isMilestone: Boolean =
       version.qualifier.exists { qualifier =>
         qualifier.length == MilestoneFormatterPattern.length + MilestoneQualifierPrefix.length &&
