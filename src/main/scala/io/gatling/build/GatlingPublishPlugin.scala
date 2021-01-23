@@ -1,24 +1,25 @@
 package io.gatling.build
 
 import scala.util.Properties._
+import io.gatling.build.publish.GatlingVersion._
+import Repositories.ReleaseStatus
+import sbtrelease.Version
+
 import sbt._
 import sbt.Keys._
-import GatlingReleasePlugin.autoimport._
-import Repositories.ReleaseStatus
 
 object GatlingPublishKeys {
   val githubPath = settingKey[String]("Project path on Github")
   val projectDevelopers = settingKey[Seq[GatlingDeveloper]]("List of contributors for this project")
-  var useSonatypeRepositories = settingKey[Boolean]("Use Sonatype repositories for CI or during release process")
+  val useSonatypeRepositories = settingKey[Boolean]("Use Sonatype repositories for CI or during release process")
   val pushToPrivateNexus = settingKey[Boolean]("Should this project's artifacts be pushed to our private Nexus ?")
+  val isMilestone = settingKey[Boolean]("Indicate if release process is milestone")
 
   case class GatlingDeveloper(emailAddress: String, name: String, isGatlingCorp: Boolean)
 }
 
 object GatlingPublishPlugin extends AutoPlugin {
-
-  override def requires: Plugins = plugins.JvmPlugin && GatlingReleasePlugin
-  override def trigger: PluginTrigger = allRequirements
+  override def requires: Plugins = plugins.JvmPlugin
   override def projectSettings: Seq[Setting[_]] = baseSettings
 
   import GatlingPublishKeys._
@@ -26,7 +27,7 @@ object GatlingPublishPlugin extends AutoPlugin {
   private val baseSettings = Seq(
     useSonatypeRepositories := false,
     crossPaths := false,
-    pushToPrivateNexus := false,
+    pushToPrivateNexus := isMilestone.value,
     publishTo := {
       val status =
         if (isSnapshot.value) ReleaseStatus.Snapshot
@@ -34,6 +35,7 @@ object GatlingPublishPlugin extends AutoPlugin {
         else ReleaseStatus.Release
       Repositories.nexusRepository(status, pushToPrivateNexus.value)
     },
+    isMilestone := version(Version(_).exists(_.isMilestone)).value,
     pomExtra := mavenScmBlock(githubPath.value) ++ developersXml(projectDevelopers.value),
     resolvers ++= (if (useSonatypeRepositories.value) sonatypeRepositories else Seq.empty) :+ Resolver.mavenLocal,
     credentials += Repositories.credentials(pushToPrivateNexus.value)
