@@ -2,8 +2,10 @@ package io.gatling.build
 
 import org.scalafmt.sbt.ScalafmtPlugin
 import org.scalafmt.sbt.ScalafmtPlugin.autoImport.{ scalafmtConfig, scalafmtOnCompile }
+
+import io.gatling.build.config.ConfigUtils._
+
 import sbt._
-import GatlingBuildConfigKeys._
 
 object GatlingAutomatedScalafmtPlugin extends AutoPlugin {
 
