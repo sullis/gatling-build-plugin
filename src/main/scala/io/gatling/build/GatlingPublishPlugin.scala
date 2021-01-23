@@ -1,10 +1,10 @@
 package io.gatling.build
 
 import scala.util.Properties._
+import io.gatling.build.publish.GatlingQualifier
 import io.gatling.build.publish.GatlingVersion._
-import Repositories.ReleaseStatus
+import io.gatling.build.publish.Repositories
 import sbtrelease.Version
-
 import sbt._
 import sbt.Keys._
 
@@ -30,9 +30,9 @@ object GatlingPublishPlugin extends AutoPlugin {
     pushToPrivateNexus := isMilestone.value,
     publishTo := {
       val status =
-        if (isSnapshot.value) ReleaseStatus.Snapshot
-        else if (isMilestone.value) ReleaseStatus.Milestone
-        else ReleaseStatus.Release
+        if (isSnapshot.value) GatlingQualifier.Snapshot
+        else if (isMilestone.value) GatlingQualifier.Milestone
+        else GatlingQualifier.Release
       Repositories.nexusRepository(status, pushToPrivateNexus.value)
     },
     isMilestone := version(Version(_).exists(_.isMilestone)).value,
