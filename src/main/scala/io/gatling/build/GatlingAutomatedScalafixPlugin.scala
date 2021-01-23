@@ -4,7 +4,7 @@ import sbt.Keys._
 import sbt._
 import scalafix.sbt.ScalafixPlugin
 import scalafix.sbt.ScalafixPlugin.autoImport._
-import GatlingBuildKeys._
+import GatlingBuildConfigKeys._
 
 object GatlingAutomatedScalafixPlugin extends AutoPlugin {
   override def requires: Plugins = ScalafixPlugin && GatlingBuildConfigPlugin

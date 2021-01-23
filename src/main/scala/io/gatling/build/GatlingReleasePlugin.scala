@@ -1,17 +1,20 @@
 package io.gatling.build
 
 import com.jsuereth.sbtpgp.PgpKeys.publishSigned
-import sbt.Keys._
-import sbt._
-import sbt.complete.DefaultParsers._
-import sbt.complete.Parser
+
 import sbtrelease.ReleasePlugin.autoImport._
+
 import xerial.sbt.Sonatype
 import xerial.sbt.Sonatype.SonatypeKeys._
 
+import sbt.complete.DefaultParsers._
+import sbt.complete.Parser
+import sbt.Keys._
+import sbt._
+
 object GatlingReleasePlugin extends AutoPlugin {
 
-  import ReleaseProcessKeys._
+  import release.ReleaseProcessKeys._
 
   override def requires: Plugins = Sonatype && GatlingPublishPlugin
 

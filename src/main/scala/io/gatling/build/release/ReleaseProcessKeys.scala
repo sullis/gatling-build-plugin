@@ -1,16 +1,19 @@
-package io.gatling.build
+package io.gatling.build.release
 
-import _root_.io.gatling.build.GatlingReleasePlugin.autoimport._
+import io.gatling.build.GatlingReleasePlugin.autoimport._
 import io.gatling.build.publish.GatlingVersion._
 import io.gatling.build.GatlingPublishKeys.pushToPrivateNexus
+
 import sbt.Keys._
 import sbt._
+
 import sbtrelease.ReleasePlugin.autoImport.ReleaseKeys._
 import sbtrelease.ReleasePlugin.autoImport._
 import sbtrelease.ReleaseStateTransformations._
 import sbtrelease.Utilities._
 import sbtrelease.Version.Bump
-import sbtrelease.{ versionFormatError, Git, Version }
+import sbtrelease._
+
 import xerial.sbt.Sonatype.SonatypeCommand.sonatypeReleaseAll
 
 import scala.sys.process.ProcessLogger
