@@ -47,7 +47,10 @@ object GatlingReleasePlugin extends AutoPlugin {
     Command.process("release with-defaults", stateWithReleaseVersionBump)
   }
 
-  override def projectSettings: Seq[Setting[_]] = gatlingReleaseSettings ++ Seq(
+  override def projectSettings: Seq[Setting[_]] = Seq(
+    skipSnapshotDepsCheck := false,
+    gatlingReleaseProcessSetting := GatlingReleaseProcess.Patch,
+    releaseProcess := fullReleaseProcess,
     releaseCrossBuild := false,
     releasePublishArtifactsAction := publishSigned.value,
     sonatypeProfileName := "io.gatling",

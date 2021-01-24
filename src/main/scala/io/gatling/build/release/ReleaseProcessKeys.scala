@@ -4,36 +4,21 @@ import io.gatling.build.GatlingReleasePlugin.autoimport._
 import io.gatling.build.GatlingPublishKeys.pushToPrivateNexus
 import io.gatling.build.release.GatlingReleaseStep._
 
-import sbt.Keys._
-import sbt._
-
 import sbtrelease.ReleasePlugin.autoImport._
 import sbtrelease.ReleaseStateTransformations._
+
+import sbt.Keys._
+import sbt._
 
 import xerial.sbt.Sonatype.SonatypeCommand.sonatypeReleaseAll
 
 object ReleaseProcessKeys {
+  def fullReleaseProcess: Seq[ReleaseStep] = {
+    val checkSnapshotDeps = if (!skipSnapshotDepsCheck.value) checkSnapshotDependencies else noop
+    val publishStep = ReleaseStep(releaseStepTaskAggregated(releasePublishArtifactsAction in Global in thisProjectRef.value))
+    val sonatypeRelease = if (publishMavenStyle.value && !(pushToPrivateNexus ?? false).value) ReleaseStep(releaseStepCommand(sonatypeReleaseAll)) else noop
 
-  val gatlingReleaseSettings = Seq(
-    skipSnapshotDepsCheck := false,
-    gatlingReleaseProcessSetting := GatlingReleaseProcess.Patch,
-    releaseProcess := {
-      val releaseOnSonatype = publishMavenStyle.value && !(pushToPrivateNexus ?? false).value
-      fullReleaseProcess(thisProjectRef.value, skipSnapshotDepsCheck.value, releaseOnSonatype, gatlingReleaseProcessSetting.value)
-    }
-  )
-
-  private def fullReleaseProcess(
-      ref: ProjectRef,
-      skipSnapshotDepsCheck: Boolean,
-      releaseOnSonatype: Boolean,
-      gatlingReleaseProcess: GatlingReleaseProcess
-  ): Seq[ReleaseStep] = {
-    val checkSnapshotDeps = if (!skipSnapshotDepsCheck) checkSnapshotDependencies else noop
-    val publishStep = ReleaseStep(releaseStepTaskAggregated(releasePublishArtifactsAction in Global in ref))
-    val sonatypeRelease = if (releaseOnSonatype) ReleaseStep(releaseStepCommand(sonatypeReleaseAll)) else noop
-
-    gatlingReleaseProcess match {
+    gatlingReleaseProcessSetting.value match {
       case GatlingReleaseProcess.Minor =>
         Seq(
           checkSnapshotDeps,
