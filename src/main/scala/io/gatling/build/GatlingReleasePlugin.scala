@@ -9,13 +9,14 @@ import xerial.sbt.Sonatype.SonatypeKeys._
 
 import sbt.complete.DefaultParsers._
 import sbt.complete.Parser
+
+import io.gatling.build.release.ReleaseProcessKeys._
+import io.gatling.build.release.GatlingReleaseProcess
+
 import sbt.Keys._
 import sbt._
 
 object GatlingReleasePlugin extends AutoPlugin {
-
-  import release.ReleaseProcessKeys._
-
   override def requires: Plugins = Sonatype && GatlingPublishPlugin
 
   object autoimport {
