@@ -10,7 +10,6 @@ import xerial.sbt.Sonatype.SonatypeKeys._
 import sbt.complete.DefaultParsers._
 import sbt.complete.Parser
 
-import io.gatling.build.release.ReleaseProcessKeys._
 import io.gatling.build.release.GatlingReleaseProcess
 
 import sbt.Keys._
@@ -20,7 +19,6 @@ object GatlingReleasePlugin extends AutoPlugin {
   override def requires: Plugins = Sonatype && GatlingPublishPlugin
 
   object autoimport {
-    lazy val gatlingReleaseProcessSetting = settingKey[GatlingReleaseProcess]("Gatling release process setting")
     lazy val skipSnapshotDepsCheck = settingKey[Boolean]("Skip snapshot dependencies check during release")
   }
 
@@ -34,12 +32,12 @@ object GatlingReleasePlugin extends AutoPlugin {
       description = "minor|patch|milestone"
     )
 
-  def gatlingRelease = Command("gatling-release")(_ => releaseProcessParser) { (state, releaseProcess) =>
+  def gatlingRelease = Command("gatling-release")(_ => releaseProcessParser) { (state, gatlingReleaseProcess) =>
     val extracted = Project.extract(state)
     val stateWithReleaseVersionBump = extracted.appendWithSession(
       Seq(
-        releaseVersionBump := releaseProcess.bump.getOrElse(releaseVersionBump.value),
-        gatlingReleaseProcessSetting := releaseProcess
+        releaseVersionBump := gatlingReleaseProcess.bump.getOrElse(releaseVersionBump.value),
+        releaseProcess := gatlingReleaseProcess.releaseSteps.value
       ),
       state
     )
@@ -49,8 +47,6 @@ object GatlingReleasePlugin extends AutoPlugin {
 
   override def projectSettings: Seq[Setting[_]] = Seq(
     skipSnapshotDepsCheck := false,
-    gatlingReleaseProcessSetting := GatlingReleaseProcess.Patch,
-    releaseProcess := fullReleaseProcess,
     releaseCrossBuild := false,
     releasePublishArtifactsAction := publishSigned.value,
     sonatypeProfileName := "io.gatling",
