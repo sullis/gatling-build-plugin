@@ -45,28 +45,6 @@ object GatlingReleaseStep {
     committedBugFixState.put(versions, masterVersions)
   }
 
-  lazy val pushTagAndReset: ReleaseStep = { st: State =>
-    val extracted = st.extract
-    val git = extractGitVcs(extracted)
-    val gitLog = stdErrorToStdOut(st.log) // Git outputs to standard error, so use a logger that redirects stderr to info
-    val (releaseTagNameState, tagName) = extracted.runTask(releaseTagName, st)
-    git.cmd("push", "origin", tagName) ! gitLog
-    git.cmd("reset", "--hard", s"origin/${git.currentBranch}") ! gitLog
-    releaseTagNameState
-  }
-
-  lazy val setMilestoneReleaseVersion: ReleaseStep = { st: State =>
-    st.extract.appendWithSession(
-      Seq(
-        releaseVersion := { rawCurrentVersion: String =>
-          val currentVersion = Version(rawCurrentVersion).getOrElse(sys.error(s"Invalid version format ($rawCurrentVersion)"))
-          currentVersion.asMilestone.string
-        }
-      ),
-      st
-    )
-  }
-
   lazy val checkMinorVersion: ReleaseStep = checkVersionStep(
     _.isPatch,
     version => s"Cannot release a minor version when current version is patch (${version.string})"

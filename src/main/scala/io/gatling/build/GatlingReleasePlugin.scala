@@ -36,7 +36,9 @@ object GatlingReleasePlugin extends AutoPlugin {
     val extracted = Project.extract(state)
     val stateWithReleaseVersionBump = extracted.appendWithSession(
       Seq(
-        releaseVersionBump := gatlingReleaseProcess.bump.getOrElse(releaseVersionBump.value),
+        releaseVersion := gatlingReleaseProcess.releaseVersion,
+        releaseVersionBump := gatlingReleaseProcess.bump,
+        releaseNextVersion := gatlingReleaseProcess.releaseNextVersion,
         releaseProcess := gatlingReleaseProcess.releaseSteps.value
       ),
       state
