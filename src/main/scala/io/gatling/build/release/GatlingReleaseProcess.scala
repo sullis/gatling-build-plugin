@@ -1,7 +1,7 @@
 package io.gatling.build.release
 
-import io.gatling.build.GatlingPublishKeys.pushToPrivateNexus
-import io.gatling.build.GatlingReleasePlugin.autoimport.skipSnapshotDepsCheck
+import io.gatling.build.GatlingPublishPlugin.autoimport._
+import io.gatling.build.GatlingReleasePlugin.autoimport._
 import io.gatling.build.release.GatlingReleaseStep._
 import io.gatling.build.publish.GatlingVersion._
 import sbtrelease.ReleasePlugin.autoImport._
@@ -28,7 +28,7 @@ object GatlingReleaseProcess {
     ReleaseStep(releaseStepTaskAggregated(releasePublishArtifactsAction in Global in thisProjectRef.value))
   }
   private def sonatypeRelease = Def.setting {
-    if (publishMavenStyle.value && !(pushToPrivateNexus ?? false).value) ReleaseStep(releaseStepCommand(sonatypeReleaseAll)) else noop
+    if (publishMavenStyle.value && !(gatlingPublishToPrivateNexus ?? false).value) ReleaseStep(releaseStepCommand(sonatypeReleaseAll)) else noop
   }
 
   case object Minor extends GatlingReleaseProcess {

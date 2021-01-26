@@ -12,13 +12,16 @@ object GatlingVersion {
   lazy val MilestoneFormatterPattern = "yyyyMMddhhmmss"
   lazy val MilestoneFormatter = new SimpleDateFormat(MilestoneFormatterPattern)
 
-  implicit class GatlingVersion(version: Version) {
+  // Note: cannot use GatlingVersion name as this will shadowed
+  implicit class GatlingVersionExtensions(version: Version) {
     def isMilestone: Boolean =
       version.qualifier.exists { qualifier =>
         qualifier.length == MilestoneFormatterPattern.length + MilestoneQualifierPrefix.length &&
         qualifier.startsWith(MilestoneQualifierPrefix) &&
         Try(MilestoneFormatter.parse(qualifier.substring(MilestoneQualifierPrefix.length))).isSuccess
       }
+
+    def isSnapshot: Boolean = version.asSnapshot == version
 
     def asMilestone: Version = {
       val qualifier = MilestoneQualifierPrefix + MilestoneFormatter.format(new Date())

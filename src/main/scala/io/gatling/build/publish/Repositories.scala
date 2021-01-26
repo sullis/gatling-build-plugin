@@ -1,35 +1,41 @@
 package io.gatling.build.publish
 
-import scala.collection.JavaConverters._
-
-import java.util.Properties
-
 import sbt._
 
 object Repositories {
+  private val DefaultRepositoryPrefix = "NEXUS_REPOSITORY"
   private val SbtHome = Path.userHome / ".sbt"
   private val PublicNexusCredentialsFile = SbtHome / ".credentials"
-  private val PrivateNexusCredentialsFile = SbtHome / ".private-nexus-credentials"
-
-  private val PrivateNexusRepositoriesRoot = {
-    val props = new Properties
-    IO.load(props, PrivateNexusCredentialsFile)
-    val propsAsMap = props.asScala.map { case (k, v) => (k, v.trim) }
-    for {
-      scheme <- propsAsMap.get("scheme")
-      host <- propsAsMap.get("host")
-    } yield s"$scheme://$host/content/repositories"
-  }
 
   private def publicNexusRepository(status: GatlingQualifier) =
     Resolver.sonatypeRepo(status.status)
 
-  private def privateNexusRepository(status: GatlingQualifier) =
-    PrivateNexusRepositoriesRoot.map(s"Private Nexus ${status.status.capitalize}" at _ + s"/${status.status}/" withAllowInsecureProtocol true)
+  def repositoryFromEnv(prefix: String, qualifier: GatlingQualifier): Option[MavenRepository] =
+    for {
+      host <- sys.env.get(prefix + "_HOST")
+      name = sys.env.getOrElse(prefix + "_NAME", "Unnamed repository")
+      secure = sys.env.getOrElse(prefix + "_SECURE", "true").toBoolean
+    } yield {
+      sys.env.get(prefix + "_URL").map { name at _ withAllowInsecureProtocol !secure }.getOrElse {
+        val scheme = if (secure) "https" else "http"
+        s"$name (${qualifier.status})" at s"$scheme://$host/content/repositories/${qualifier.status}" withAllowInsecureProtocol !secure
+      }
+    }
 
-  def nexusRepository(kind: GatlingQualifier, usePrivate: Boolean): Option[MavenRepository] =
-    if (usePrivate) privateNexusRepository(kind) else Some(publicNexusRepository(kind))
+  def nexusRepository(kind: GatlingQualifier): MavenRepository =
+    repositoryFromEnv(DefaultRepositoryPrefix, kind) getOrElse publicNexusRepository(kind)
 
-  def credentials(usePrivate: Boolean): Credentials =
-    Credentials(if (usePrivate) PrivateNexusCredentialsFile else PublicNexusCredentialsFile)
+  def credentialsFromEnv(prefix: String): Option[Credentials] =
+    for {
+      realm <- sys.env.get(prefix + "_REALM")
+      host <- sys.env.get(prefix + "_HOST")
+      userName <- sys.env.get(prefix + "_USERNAME")
+      passwd <- sys.env.get(prefix + "_PASSWORD")
+    } yield Credentials(realm, host, userName, passwd)
+
+  def credentials: Seq[Credentials] =
+    Seq(
+      credentialsFromEnv(DefaultRepositoryPrefix),
+      Option(PublicNexusCredentialsFile).filter(_.exists).map(Credentials.apply)
+    ).flatten
 }

@@ -8,37 +8,30 @@ import sbtrelease.Version
 import sbt._
 import sbt.Keys._
 
-object GatlingPublishKeys {
-  val githubPath = settingKey[String]("Project path on Github")
-  val projectDevelopers = settingKey[Seq[GatlingDeveloper]]("List of contributors for this project")
-  val useSonatypeRepositories = settingKey[Boolean]("Use Sonatype repositories for CI or during release process")
-  val pushToPrivateNexus = settingKey[Boolean]("Should this project's artifacts be pushed to our private Nexus ?")
-  val isMilestone = settingKey[Boolean]("Indicate if release process is milestone")
-
-  case class GatlingDeveloper(emailAddress: String, name: String, isGatlingCorp: Boolean)
-}
-
 object GatlingPublishPlugin extends AutoPlugin {
   override def requires: Plugins = plugins.JvmPlugin
-  override def projectSettings: Seq[Setting[_]] = baseSettings
 
-  import GatlingPublishKeys._
+  object autoimport {
+    val githubPath = settingKey[String]("Project path on Github")
+    val projectDevelopers = settingKey[Seq[GatlingDeveloper]]("List of contributors for this project")
+    val gatlingPublishAddSonatypeResolvers = settingKey[Boolean]("Use Sonatype repositories for CI or during release process")
+    val gatlingPublishToPrivateNexus = settingKey[Boolean]("Should this project's artifacts be pushed to our private Nexus ?")
+    val isMilestone = settingKey[Boolean]("Indicate if release process is milestone")
 
-  private val baseSettings = Seq(
-    useSonatypeRepositories := false,
+    case class GatlingDeveloper(emailAddress: String, name: String, isGatlingCorp: Boolean)
+  }
+
+  import autoimport._
+
+  override def projectSettings: Seq[Setting[_]] = Seq(
+    gatlingPublishAddSonatypeResolvers := false,
     crossPaths := false,
-    pushToPrivateNexus := isMilestone.value,
-    publishTo := {
-      val status =
-        if (isSnapshot.value) GatlingQualifier.Snapshot
-        else if (isMilestone.value) GatlingQualifier.Milestone
-        else GatlingQualifier.Release
-      Repositories.nexusRepository(status, pushToPrivateNexus.value)
-    },
+    gatlingPublishToPrivateNexus := isMilestone.value,
+    publishTo := Some(Repositories.nexusRepository(GatlingQualifier(version.value))),
     isMilestone := version(Version(_).exists(_.isMilestone)).value,
     pomExtra := mavenScmBlock(githubPath.value) ++ developersXml(projectDevelopers.value),
-    resolvers ++= (if (useSonatypeRepositories.value) sonatypeRepositories else Seq.empty) :+ Resolver.mavenLocal,
-    credentials += Repositories.credentials(pushToPrivateNexus.value)
+    resolvers ++= (if (gatlingPublishAddSonatypeResolvers.value) sonatypeRepositories else Seq.empty) :+ Resolver.mavenLocal,
+    credentials ++= Repositories.credentials
   )
 
   private def sonatypeRepositories: Seq[Resolver] =

@@ -4,7 +4,7 @@ import org.scalatest.matchers.should._
 import org.scalatest.wordspec._
 import sbtrelease.Version
 
-class GatlingVersionSpec extends AnyWordSpec with Matchers {
+class GatlingVersionExtensionsSpec extends AnyWordSpec with Matchers {
   import io.gatling.build.publish.GatlingVersion._
   "A version" when {
     "minor" should {
