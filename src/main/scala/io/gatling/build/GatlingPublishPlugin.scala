@@ -11,7 +11,7 @@ import sbt.Keys._
 object GatlingPublishPlugin extends AutoPlugin {
   override def requires: Plugins = plugins.JvmPlugin
 
-  object autoimport {
+  object autoImport {
     val githubPath = settingKey[String]("Project path on Github")
     val projectDevelopers = settingKey[Seq[GatlingDeveloper]]("List of contributors for this project")
     val gatlingPublishAddSonatypeResolvers = settingKey[Boolean]("Use Sonatype repositories for CI or during release process")
@@ -21,7 +21,7 @@ object GatlingPublishPlugin extends AutoPlugin {
     case class GatlingDeveloper(emailAddress: String, name: String, isGatlingCorp: Boolean)
   }
 
-  import autoimport._
+  import autoImport._
 
   override def projectSettings: Seq[Setting[_]] = Seq(
     gatlingPublishAddSonatypeResolvers := false,

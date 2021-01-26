@@ -18,11 +18,11 @@ import sbt._
 object GatlingReleasePlugin extends AutoPlugin {
   override def requires: Plugins = Sonatype && GatlingPublishPlugin
 
-  object autoimport {
+  object autoImport {
     lazy val skipSnapshotDepsCheck = settingKey[Boolean]("Skip snapshot dependencies check during release")
   }
 
-  import autoimport._
+  import autoImport._
 
   private lazy val releaseProcessParser: Parser[GatlingReleaseProcess] =
     Space ~> token(

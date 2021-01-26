@@ -45,6 +45,11 @@ object GatlingReleaseStep {
     committedBugFixState.put(versions, masterVersions)
   }
 
+  lazy val writeCurrentVersion: ReleaseStep = { st: State =>
+    IO.write(st.extract.get(target) / "release-info", st.extract.get(version))
+    st
+  }
+
   lazy val checkMinorVersion: ReleaseStep = checkVersionStep(
     _.isPatch,
     version => s"Cannot release a minor version when current version is patch (${version.string})"

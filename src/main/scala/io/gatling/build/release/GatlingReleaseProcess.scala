@@ -1,7 +1,7 @@
 package io.gatling.build.release
 
-import io.gatling.build.GatlingPublishPlugin.autoimport._
-import io.gatling.build.GatlingReleasePlugin.autoimport._
+import io.gatling.build.GatlingPublishPlugin.autoImport._
+import io.gatling.build.GatlingReleasePlugin.autoImport._
 import io.gatling.build.release.GatlingReleaseStep._
 import io.gatling.build.publish.GatlingVersion._
 import sbtrelease.ReleasePlugin.autoImport._
@@ -47,6 +47,7 @@ object GatlingReleaseProcess {
         commitReleaseVersion,
         tagRelease,
         publishStep.value,
+        writeCurrentVersion,
         pushChanges,
         createBugfixBranch,
         setNextVersion,
@@ -73,6 +74,7 @@ object GatlingReleaseProcess {
         commitReleaseVersion,
         tagRelease,
         publishStep.value,
+        writeCurrentVersion,
         pushChanges,
         setNextVersion,
         commitNextVersion,
@@ -100,6 +102,7 @@ object GatlingReleaseProcess {
         setReleaseVersion,
         tagRelease,
         publishStep.value,
+        writeCurrentVersion,
         pushChanges,
         setNextVersion
       )
