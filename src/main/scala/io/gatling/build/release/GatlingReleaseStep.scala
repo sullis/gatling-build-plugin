@@ -1,19 +1,23 @@
 package io.gatling.build.release
 
-import io.gatling.build.publish.GatlingVersion._
+import io.gatling.build.publish.GatlingVersion
 import sbtrelease.ReleasePlugin.autoImport.ReleaseKeys._
 import sbtrelease.ReleasePlugin.autoImport._
 import sbtrelease.ReleaseStateTransformations._
 import sbtrelease.Utilities._
 import sbtrelease.Version._
-import sbtrelease._
 import sbt.Keys._
 import sbt._
+import sbtrelease.{ versionFormatError, Git }
 
 import scala.sys.process.ProcessLogger
 
 object GatlingReleaseStep {
   val noop: ReleaseStep = ReleaseStep(identity)
+
+  def gatlingVersion(transform: GatlingVersion => GatlingVersion = identity): String => String = { ver =>
+    GatlingVersion(ver).map(transform(_).string).getOrElse(versionFormatError(ver))
+  }
 
   lazy val createBugfixBranch: ReleaseStep = { st: State =>
     val masterVersions = st.get(versions).getOrElse(sys.error("Versions should have already been inquired"))
@@ -21,12 +25,13 @@ object GatlingReleaseStep {
     val git = extractGitVcs(extracted)
 
     val rawModuleVersion = extracted.get(version)
-    val moduleVersion = Version(rawModuleVersion).getOrElse(versionFormatError(rawModuleVersion))
+    val moduleVersion = GatlingVersion(rawModuleVersion).getOrElse(versionFormatError(rawModuleVersion))
     val branchName = moduleVersion.branchName
 
     val minorBugFixBranchState = extracted.appendWithSession(
       Seq(
-        releaseVersionBump := Bump.Bugfix
+        releaseVersion := gatlingVersion(_.withoutQualifier),
+        releaseNextVersion := gatlingVersion(_.bumpPatch.asSnapshot)
       ),
       st
     )
@@ -37,7 +42,7 @@ object GatlingReleaseStep {
     val originBranch = git.currentBranch
     git.cmd("checkout", "-b", branchName) ! gitLog
 
-    val committedBugFixState = commitNextVersion.action(bugFixState)
+    val committedBugFixState = commitNextVersion(bugFixState)
 
     git.cmd("push", "--set-upstream", "origin", s"$branchName:$branchName") ! gitLog
 
@@ -66,12 +71,12 @@ object GatlingReleaseStep {
       .collect { case git: Git => git }
       .getOrElse(sys.error("Aborting release. Working directory is not a Git repository."))
 
-  private def checkVersionStep(validate: Version => Boolean, error: Version => String): ReleaseStep =
+  private def checkVersionStep(validate: GatlingVersion => Boolean, error: GatlingVersion => String): ReleaseStep =
     ReleaseStep(
       identity,
       check = { st: State =>
         val rawCurrentVersion = st.extract.get(version)
-        val currentVersion = Version(rawCurrentVersion).getOrElse(sys.error(s"Invalid version format $rawCurrentVersion"))
+        val currentVersion = GatlingVersion(rawCurrentVersion).getOrElse(sys.error(s"Invalid version format $rawCurrentVersion"))
         if (validate(currentVersion)) {
           sys.error(error(currentVersion))
         }

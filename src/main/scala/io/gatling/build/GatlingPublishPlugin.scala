@@ -1,10 +1,7 @@
 package io.gatling.build
 
 import scala.util.Properties._
-import io.gatling.build.publish.GatlingQualifier
-import io.gatling.build.publish.GatlingVersion._
-import io.gatling.build.publish.Repositories
-import sbtrelease.Version
+import io.gatling.build.publish.GatlingVersion
 import sbt._
 import sbt.Keys._
 
@@ -27,11 +24,9 @@ object GatlingPublishPlugin extends AutoPlugin {
     gatlingPublishAddSonatypeResolvers := false,
     crossPaths := false,
     gatlingPublishToPrivateNexus := isMilestone.value,
-    publishTo := Some(Repositories.nexusRepository(GatlingQualifier(version.value))),
-    isMilestone := version(Version(_).exists(_.isMilestone)).value,
+    isMilestone := version(GatlingVersion(_).exists(_.isMilestone)).value,
     pomExtra := mavenScmBlock(githubPath.value) ++ developersXml(projectDevelopers.value),
-    resolvers ++= (if (gatlingPublishAddSonatypeResolvers.value) sonatypeRepositories else Seq.empty) :+ Resolver.mavenLocal,
-    credentials ++= Repositories.credentials
+    resolvers ++= (if (gatlingPublishAddSonatypeResolvers.value) sonatypeRepositories else Seq.empty) :+ Resolver.mavenLocal
   )
 
   private def sonatypeRepositories: Seq[Resolver] =

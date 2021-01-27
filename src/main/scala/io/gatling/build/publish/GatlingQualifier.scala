@@ -1,12 +1,9 @@
 package io.gatling.build.publish
 
-import sbtrelease.Version
-import io.gatling.build.publish.GatlingVersion._
-
 sealed abstract class GatlingQualifier(val status: String)
 object GatlingQualifier {
   def apply(version: String): GatlingQualifier =
-    Version(version) match {
+    GatlingVersion(version) match {
       case Some(ver) if ver.isSnapshot  => Snapshot
       case Some(ver) if ver.isMilestone => Milestone
       case _                            => Release
