@@ -24,27 +24,32 @@ object GatlingReleasePlugin extends AutoPlugin {
 
   import autoImport._
 
-  private lazy val releaseProcessParser: Parser[GatlingReleaseProcess] =
-    Space ~> token(
-      "minor" ^^^ GatlingReleaseProcess.Minor |
-        "patch" ^^^ GatlingReleaseProcess.Patch |
-        "milestone" ^^^ GatlingReleaseProcess.Milestone,
-      description = "minor|patch|milestone"
-    )
+  private lazy val minorParser: Parser[GatlingReleaseProcess] =
+    (Space ~> token("minor")) ^^^ GatlingReleaseProcess.Minor
 
-  def gatlingRelease = Command("gatling-release")(_ => releaseProcessParser) { (state, gatlingReleaseProcess) =>
-    val extracted = Project.extract(state)
-    val stateWithReleaseVersionBump = extracted.appendWithSession(
-      Seq(
-        releaseVersion := gatlingReleaseProcess.releaseVersion,
-        releaseNextVersion := gatlingReleaseProcess.releaseNextVersion,
-        releaseProcess := gatlingReleaseProcess.releaseSteps.value
-      ),
-      state
-    )
+  private lazy val patchParser: Parser[GatlingReleaseProcess] =
+    (Space ~> token("patch")) ^^^ GatlingReleaseProcess.Patch
 
-    Command.process("release with-defaults", stateWithReleaseVersionBump)
-  }
+  private lazy val milestoneParser: Parser[GatlingReleaseProcess] =
+    (Space ~> token("milestone")) ^^^ GatlingReleaseProcess.Milestone
+
+  private lazy val releaseProcessParser: Parser[GatlingReleaseProcess] = minorParser | patchParser | milestoneParser
+
+  def gatlingRelease =
+    Command("gatling-release", ("gatling-release <minor|patch|milestone>", "release in Gatling way"), "release in Gatling way")(_ => releaseProcessParser) {
+      (state, gatlingReleaseProcess) =>
+        val extracted = Project.extract(state)
+        val stateWithReleaseVersionBump = extracted.appendWithSession(
+          Seq(
+            releaseVersion := gatlingReleaseProcess.releaseVersion,
+            releaseNextVersion := gatlingReleaseProcess.releaseNextVersion,
+            releaseProcess := gatlingReleaseProcess.releaseSteps.value
+          ),
+          state
+        )
+
+        Command.process("release with-defaults", stateWithReleaseVersionBump)
+    }
 
   override def projectSettings: Seq[Setting[_]] = Seq(
     skipSnapshotDepsCheck := false,
