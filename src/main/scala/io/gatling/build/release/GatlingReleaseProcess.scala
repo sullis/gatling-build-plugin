@@ -1,6 +1,5 @@
 package io.gatling.build.release
 
-import io.gatling.build.GatlingPublishPlugin.autoImport._
 import io.gatling.build.GatlingReleasePlugin.autoImport._
 import io.gatling.build.release.GatlingReleaseStep._
 import sbtrelease.ReleasePlugin.autoImport._
@@ -23,7 +22,7 @@ object GatlingReleaseProcess {
     ReleaseStep(releaseStepTaskAggregated(releasePublishArtifactsAction in Global in thisProjectRef.value))
   }
   private def sonatypeRelease = Def.setting {
-    if (publishMavenStyle.value && !(gatlingPublishToPrivateNexus ?? false).value) ReleaseStep(releaseStepCommand(sonatypeReleaseAll)) else noop
+    if (publishMavenStyle.value && !(gatlingReleaseToSonatype ?? false).value) ReleaseStep(releaseStepCommand(sonatypeReleaseAll)) else noop
   }
 
   case object Minor extends GatlingReleaseProcess {

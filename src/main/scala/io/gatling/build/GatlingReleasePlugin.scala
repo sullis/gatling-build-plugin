@@ -20,6 +20,7 @@ object GatlingReleasePlugin extends AutoPlugin {
 
   object autoImport {
     lazy val skipSnapshotDepsCheck = settingKey[Boolean]("Skip snapshot dependencies check during release")
+    lazy val gatlingReleaseToSonatype = settingKey[Boolean]("Should we use sonatype release")
   }
 
   import autoImport._
