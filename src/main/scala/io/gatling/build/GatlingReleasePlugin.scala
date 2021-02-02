@@ -4,9 +4,6 @@ import com.jsuereth.sbtpgp.PgpKeys.publishSigned
 
 import sbtrelease.ReleasePlugin.autoImport._
 
-import xerial.sbt.Sonatype
-import xerial.sbt.Sonatype.SonatypeKeys._
-
 import sbt.complete.DefaultParsers._
 import sbt.complete.Parser
 
@@ -16,11 +13,10 @@ import sbt.Keys._
 import sbt._
 
 object GatlingReleasePlugin extends AutoPlugin {
-  override def requires: Plugins = Sonatype && GatlingPublishPlugin
+  override def requires: Plugins = GatlingPublishPlugin
 
   object autoImport {
     lazy val skipSnapshotDepsCheck = settingKey[Boolean]("Skip snapshot dependencies check during release")
-    lazy val gatlingReleaseToSonatype = settingKey[Boolean]("Should we use sonatype release")
   }
 
   import autoImport._
@@ -56,7 +52,6 @@ object GatlingReleasePlugin extends AutoPlugin {
     skipSnapshotDepsCheck := false,
     releaseCrossBuild := false,
     releasePublishArtifactsAction := publishSigned.value,
-    sonatypeProfileName := "io.gatling",
     commands += gatlingRelease
   )
 }

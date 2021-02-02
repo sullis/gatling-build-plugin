@@ -5,7 +5,6 @@ import sbtrelease.ReleasePlugin.autoImport.ReleaseKeys._
 import sbtrelease.ReleasePlugin.autoImport._
 import sbtrelease.ReleaseStateTransformations._
 import sbtrelease.Utilities._
-import sbtrelease.Version._
 import sbt.Keys._
 import sbt._
 import sbtrelease.{ versionFormatError, Git }

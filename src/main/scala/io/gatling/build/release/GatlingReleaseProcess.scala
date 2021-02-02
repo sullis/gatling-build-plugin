@@ -4,7 +4,6 @@ import io.gatling.build.GatlingReleasePlugin.autoImport._
 import io.gatling.build.release.GatlingReleaseStep._
 import sbtrelease.ReleasePlugin.autoImport._
 import sbtrelease.ReleaseStateTransformations._
-import xerial.sbt.Sonatype.SonatypeCommand.sonatypeReleaseAll
 import sbt._
 import sbt.Keys._
 
@@ -19,10 +18,8 @@ object GatlingReleaseProcess {
     if (!skipSnapshotDepsCheck.value) checkSnapshotDependencies else noop
   }
   private def publishStep = Def.setting {
+    // releaseP
     ReleaseStep(releaseStepTaskAggregated(releasePublishArtifactsAction in Global in thisProjectRef.value))
-  }
-  private def sonatypeRelease = Def.setting {
-    if (publishMavenStyle.value && !(gatlingReleaseToSonatype ?? false).value) ReleaseStep(releaseStepCommand(sonatypeReleaseAll)) else noop
   }
 
   case object Minor extends GatlingReleaseProcess {
@@ -46,8 +43,7 @@ object GatlingReleaseProcess {
         createBugfixBranch,
         setNextVersion,
         commitNextVersion,
-        pushChanges,
-        sonatypeRelease.value
+        pushChanges
       )
     }
   }
@@ -72,8 +68,7 @@ object GatlingReleaseProcess {
         pushChanges,
         setNextVersion,
         commitNextVersion,
-        pushChanges,
-        sonatypeRelease.value
+        pushChanges
       )
     }
   }
