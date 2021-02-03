@@ -67,16 +67,18 @@ object GatlingOssPlugin extends AutoPlugin {
         publishSigned.value
       }
     },
-    gatlingReleasePublishStep := {
-      if (GatlingVersion(version.value).exists(_.isMilestone)) {
-        GatlingReleasePlugin.publishStep
-      } else {
-        publishStep
-      }
-    }
+    gatlingReleasePublishStep := conditionalPublishStep
   )
 
-  val publishStep: ReleaseStep = ReleaseStep { state: State =>
+  val conditionalPublishStep: ReleaseStep = { state: State =>
+    if (GatlingVersion(Project.extract(state).get(version)).exists(_.isMilestone)) {
+      GatlingReleasePlugin.publishStep(state)
+    } else {
+      publishStep(state)
+    }
+  }
+
+  val publishStep: ReleaseStep = { state: State =>
     /*
      * Issues:
      *  - sbt-sonatype plugin only declares commands (not tasks)
