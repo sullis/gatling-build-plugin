@@ -70,7 +70,12 @@ object GatlingReleasePlugin extends AutoPlugin {
   override def projectSettings: Seq[Setting[_]] = Seq(
     skipSnapshotDepsCheck := false,
     releaseCrossBuild := false,
-    releasePublishArtifactsAction := publishSigned.value,
-    commands += gatlingRelease
+    commands += gatlingRelease,
+    gatlingReleasePublishStep := publishStep
   )
+
+  val publishStep: ReleaseStep = ReleaseStep { state: State =>
+    val extracted = Project.extract(state)
+    extracted.runAggregated(releasePublishArtifactsAction in Global in extracted.currentRef, state)
+  }
 }

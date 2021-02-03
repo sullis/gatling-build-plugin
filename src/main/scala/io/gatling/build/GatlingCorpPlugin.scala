@@ -23,7 +23,6 @@ import io.gatling.build.compile.GatlingCompilerSettingsPlugin
 import io.gatling.build.license._
 import io.gatling.build.publish.GatlingPublishPlugin
 import io.gatling.build.release.GatlingReleasePlugin
-import io.gatling.build.release.GatlingReleasePlugin.GatlingReleaseKeys._
 
 import de.heikoseeberger.sbtheader.AutomateHeaderPlugin
 import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport.headerLicense
@@ -43,12 +42,6 @@ object GatlingCorpPlugin extends AutoPlugin {
 
   override def projectSettings: Seq[Def.Setting[_]] = Seq(
     headerLicense := AllRightsReservedLicense,
-    releasePublishArtifactsAction := Keys.publish.value,
-    gatlingReleasePublishStep := publishStep
+    releasePublishArtifactsAction := Keys.publish.value
   )
-
-  val publishStep: ReleaseStep = ReleaseStep { state: State =>
-    val extracted = Project.extract(state)
-    extracted.runAggregated(releasePublishArtifactsAction in Global in extracted.currentRef, state)
-  }
 }

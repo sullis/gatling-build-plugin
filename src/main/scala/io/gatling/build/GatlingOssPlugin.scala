@@ -60,8 +60,20 @@ object GatlingOssPlugin extends AutoPlugin {
       }
     },
     sonatypeSessionName := s"[sbt-sonatype] ${githubPath.value} ${version.value}",
-    releasePublishArtifactsAction := publishSigned.value,
-    gatlingReleasePublishStep := publishStep
+    releasePublishArtifactsAction := {
+      if (GatlingVersion(version.value).exists(_.isMilestone)) {
+        Keys.publish.value
+      } else {
+        publishSigned.value
+      }
+    },
+    gatlingReleasePublishStep := {
+      if (GatlingVersion(version.value).exists(_.isMilestone)) {
+        GatlingReleasePlugin.publishStep
+      } else {
+        publishStep
+      }
+    }
   )
 
   val publishStep: ReleaseStep = ReleaseStep { state: State =>

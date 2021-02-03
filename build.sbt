@@ -39,3 +39,13 @@ lazy val root = (project in file("."))
     addSbtPlugin("org.xerial.sbt"    % "sbt-sonatype" % "3.9.5"),
     libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.2" % Test
   )
+
+addCommandAlias(
+  "ci-checks",
+  List(
+    "all clean scalafmtSbtCheck scalafmtCheckAll",
+    "all gatlingScalafixCheck",
+    "test",
+    "scripted"
+  ).mkString(";", ";", "")
+)
