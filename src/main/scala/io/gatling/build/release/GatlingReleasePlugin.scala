@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package io.gatling.build
+package io.gatling.build.release
 
-import io.gatling.build.release.GatlingReleaseProcess
+import io.gatling.build.publish.GatlingPublishPlugin
 
 import com.jsuereth.sbtpgp.PgpKeys.publishSigned
 import sbtrelease.ReleasePlugin
@@ -30,10 +30,13 @@ import sbt.complete.Parser
 object GatlingReleasePlugin extends AutoPlugin {
   override def requires: Plugins = GatlingPublishPlugin && ReleasePlugin
 
-  object autoImport {
+  trait GatlingReleaseKeys {
     lazy val skipSnapshotDepsCheck = settingKey[Boolean]("Skip snapshot dependencies check during release")
     lazy val gatlingReleasePublishStep = settingKey[ReleaseStep]("releaseStep to execute")
   }
+
+  object GatlingReleaseKeys extends GatlingReleaseKeys
+  object autoImport extends GatlingReleaseKeys
 
   import autoImport._
 

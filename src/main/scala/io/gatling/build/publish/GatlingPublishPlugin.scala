@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-package io.gatling.build
+package io.gatling.build.publish
 
-import scala.util.Properties._
-
-import io.gatling.build.publish.GatlingVersion
+import scala.util.Properties.{ envOrNone, propOrNone }
 
 import sbt._
 import sbt.Keys._
@@ -26,10 +24,15 @@ import sbt.Keys._
 object GatlingPublishPlugin extends AutoPlugin {
   override def requires: Plugins = plugins.JvmPlugin
 
-  object autoImport {
+  trait GatlingPublishKeys {
     val gatlingPublishAddSonatypeResolvers = settingKey[Boolean]("Use Sonatype repositories for CI or during release process")
     val isMilestone = settingKey[Boolean]("Indicate if release process is milestone")
+
+    type GatlingVersion = _root_.io.gatling.build.publish.GatlingVersion
   }
+
+  object GatlingPublishKeys extends GatlingPublishKeys
+  object autoImport extends GatlingPublishKeys
 
   import autoImport._
 

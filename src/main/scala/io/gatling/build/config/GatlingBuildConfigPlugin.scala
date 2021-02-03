@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.gatling.build
+package io.gatling.build.config
 
 import sbt._
 import sbt.Keys._
@@ -22,7 +22,19 @@ import sbt.Keys._
 object GatlingBuildConfigPlugin extends AutoPlugin {
   override def requires = empty
 
-  import config.Keys._
+  trait GatlingBuildConfigKeys {
+    val gatlingBuildConfigDirectory = settingKey[File]("Location where to put configuration from gatling-build-plugin. Defaults to target/gatling-build-config")
+
+    def writeResourceOnConfigDirectoryFile(path: String, to: Def.Initialize[File]): Def.Initialize[Task[File]] = Def.task {
+      val resourceInputStream = getClass.getResourceAsStream(path)
+      val file = to.value
+      IO.transfer(resourceInputStream, file)
+      file
+    }
+  }
+  object GatlingBuildConfigKeys extends GatlingBuildConfigKeys
+
+  import GatlingBuildConfigKeys._
 
   override def projectSettings: Seq[Def.Setting[_]] = Seq(
     gatlingBuildConfigDirectory := target.value / "gatling-build-config"

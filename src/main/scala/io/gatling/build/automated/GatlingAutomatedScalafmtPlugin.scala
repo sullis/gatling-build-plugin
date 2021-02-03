@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package io.gatling.build
+package io.gatling.build.automated
 
-import io.gatling.build.config.ConfigUtils._
+import io.gatling.build.config.GatlingBuildConfigPlugin
 
 import org.scalafmt.sbt.ScalafmtPlugin
-import org.scalafmt.sbt.ScalafmtPlugin.autoImport.{ scalafmtConfig, scalafmtOnCompile }
+import org.scalafmt.sbt.ScalafmtPlugin.autoImport._
 
 import sbt._
 
@@ -31,10 +31,12 @@ object GatlingAutomatedScalafmtPlugin extends AutoPlugin {
     scalafmtOnCompile := true
   )
 
-  private lazy val scalafmtConfigFileSetting = resourceOnConfigDirectoryPath(".scalafmt.conf")
+  import GatlingBuildConfigPlugin.GatlingBuildConfigKeys._
+
+  private lazy val scalafmtConfigFileSetting = Def.setting { gatlingBuildConfigDirectory.value / ".scalafmt.conf" }
   private lazy val scalafmtWriteConfigFile = writeResourceOnConfigDirectoryFile(
-    path = "default.scalafmt.conf",
-    fileSetting = scalafmtConfigFileSetting
+    path = "/default.scalafmt.conf",
+    to = scalafmtConfigFileSetting
   )
 
   override def projectSettings: Seq[Def.Setting[_]] = Seq(

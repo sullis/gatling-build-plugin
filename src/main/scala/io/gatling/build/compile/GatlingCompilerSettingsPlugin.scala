@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.gatling.build
+package io.gatling.build.compile
 
 import sbt._
 import sbt.Keys._

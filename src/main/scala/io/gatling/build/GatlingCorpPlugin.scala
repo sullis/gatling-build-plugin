@@ -16,9 +16,15 @@
 
 package io.gatling.build
 
+import io.gatling.build.automated.GatlingAutomatedScalafixPlugin
+import io.gatling.build.automated.GatlingAutomatedScalafmtPlugin
+import io.gatling.build.basic.GatlingBasicInfoPlugin
+import io.gatling.build.compile.GatlingCompilerSettingsPlugin
 import io.gatling.build.license._
+import io.gatling.build.publish.GatlingPublishPlugin
+import io.gatling.build.release.GatlingReleasePlugin
+import io.gatling.build.release.GatlingReleasePlugin.GatlingReleaseKeys._
 
-import _root_.io.gatling.build.GatlingReleasePlugin.autoImport.gatlingReleasePublishStep
 import de.heikoseeberger.sbtheader.AutomateHeaderPlugin
 import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport.headerLicense
 import sbtrelease.ReleasePlugin.autoImport.{ releasePublishArtifactsAction, ReleaseStep }
@@ -37,7 +43,7 @@ object GatlingCorpPlugin extends AutoPlugin {
 
   override def projectSettings: Seq[Def.Setting[_]] = Seq(
     headerLicense := AllRightsReservedLicense,
-    releasePublishArtifactsAction := sbt.Keys.publish.value,
+    releasePublishArtifactsAction := Keys.publish.value,
     gatlingReleasePublishStep := publishStep
   )
 

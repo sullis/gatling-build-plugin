@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package io.gatling.build
+package io.gatling.build.basic
 
-import sbt.{ Def, _ }
+import sbt._
 import sbt.Keys._
 
 object GatlingBasicInfoPlugin extends AutoPlugin {
@@ -24,12 +24,14 @@ object GatlingBasicInfoPlugin extends AutoPlugin {
 
   override def trigger = allRequirements
 
-  object autoImport {
+  trait GatlingBasicInfoKeys {
     val githubPath = settingKey[String]("Project path on Github")
-
     val gatlingDevelopers = settingKey[Seq[GatlingDeveloper]]("List of contributors for this project")
+
     case class GatlingDeveloper(emailAddress: String, name: String, isGatlingCorp: Boolean)
   }
+  object GatlingBasicInfoKeys extends GatlingBasicInfoKeys
+  object autoImport extends GatlingBasicInfoKeys
 
   import autoImport._
 

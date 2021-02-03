@@ -16,9 +16,9 @@
 
 package io.gatling.build.release
 
-import io.gatling.build.GatlingReleasePlugin.autoImport._
 import io.gatling.build.release.GatlingReleaseStep._
 
+import GatlingReleasePlugin.GatlingReleaseKeys._
 import sbtrelease.ReleasePlugin.autoImport._
 import sbtrelease.ReleaseStateTransformations._
 
