@@ -19,10 +19,11 @@ package io.gatling.build.release
 import io.gatling.build.GatlingReleasePlugin.autoImport._
 import io.gatling.build.release.GatlingReleaseStep._
 
-import sbt._
-import sbt.Keys._
 import sbtrelease.ReleasePlugin.autoImport._
 import sbtrelease.ReleaseStateTransformations._
+
+import sbt._
+import sbt.Keys._
 
 sealed trait GatlingReleaseProcess {
   def releaseSteps: Def.Initialize[Seq[ReleaseStep]]

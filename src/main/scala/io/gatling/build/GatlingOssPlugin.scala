@@ -24,12 +24,13 @@ import io.gatling.build.publish.GatlingVersion
 import com.jsuereth.sbtpgp.PgpKeys.publishSigned
 import de.heikoseeberger.sbtheader.AutomateHeaderPlugin
 import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport.headerLicense
-import sbt._
-import sbt.Keys._
 import sbtrelease.ReleasePlugin.autoImport.{ releasePublishArtifactsAction, releaseStepCommandAndRemaining, ReleaseStep }
 import sbtrelease.ReleaseStateTransformations.reapply
 import xerial.sbt.Sonatype
 import xerial.sbt.Sonatype.autoImport.{ sonatypePublishTo, sonatypeSessionName, sonatypeTargetRepositoryProfile }
+
+import sbt._
+import sbt.Keys._
 
 object GatlingOssPlugin extends AutoPlugin {
   override def requires =

@@ -20,6 +20,7 @@ import io.gatling.build.config.ConfigUtils._
 
 import org.scalafmt.sbt.ScalafmtPlugin
 import org.scalafmt.sbt.ScalafmtPlugin.autoImport.{ scalafmtConfig, scalafmtOnCompile }
+
 import sbt._
 
 object GatlingAutomatedScalafmtPlugin extends AutoPlugin {

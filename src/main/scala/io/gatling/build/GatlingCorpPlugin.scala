@@ -21,8 +21,9 @@ import io.gatling.build.license._
 import _root_.io.gatling.build.GatlingReleasePlugin.autoImport.gatlingReleasePublishStep
 import de.heikoseeberger.sbtheader.AutomateHeaderPlugin
 import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport.headerLicense
-import sbt._
 import sbtrelease.ReleasePlugin.autoImport.{ releasePublishArtifactsAction, ReleaseStep }
+
+import sbt._
 
 object GatlingCorpPlugin extends AutoPlugin {
   override def requires =

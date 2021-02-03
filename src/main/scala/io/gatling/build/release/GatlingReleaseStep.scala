@@ -20,13 +20,14 @@ import scala.sys.process.ProcessLogger
 
 import io.gatling.build.publish.GatlingVersion
 
-import sbt._
-import sbt.Keys._
 import sbtrelease.{ versionFormatError, Git }
 import sbtrelease.ReleasePlugin.autoImport._
 import sbtrelease.ReleasePlugin.autoImport.ReleaseKeys._
 import sbtrelease.ReleaseStateTransformations._
 import sbtrelease.Utilities._
+
+import sbt._
+import sbt.Keys._
 
 object GatlingReleaseStep {
   val noop: ReleaseStep = ReleaseStep(identity)

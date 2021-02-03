@@ -19,12 +19,13 @@ package io.gatling.build
 import io.gatling.build.release.GatlingReleaseProcess
 
 import com.jsuereth.sbtpgp.PgpKeys.publishSigned
+import sbtrelease.ReleasePlugin
+import sbtrelease.ReleasePlugin.autoImport._
+
 import sbt._
 import sbt.Keys._
 import sbt.complete.DefaultParsers._
 import sbt.complete.Parser
-import sbtrelease.ReleasePlugin
-import sbtrelease.ReleasePlugin.autoImport._
 
 object GatlingReleasePlugin extends AutoPlugin {
   override def requires: Plugins = GatlingPublishPlugin && ReleasePlugin
