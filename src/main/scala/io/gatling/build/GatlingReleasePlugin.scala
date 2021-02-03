@@ -23,13 +23,15 @@ import sbt._
 import sbt.Keys._
 import sbt.complete.DefaultParsers._
 import sbt.complete.Parser
+import sbtrelease.ReleasePlugin
 import sbtrelease.ReleasePlugin.autoImport._
 
 object GatlingReleasePlugin extends AutoPlugin {
-  override def requires: Plugins = GatlingPublishPlugin
+  override def requires: Plugins = GatlingPublishPlugin && ReleasePlugin
 
   object autoImport {
     lazy val skipSnapshotDepsCheck = settingKey[Boolean]("Skip snapshot dependencies check during release")
+    lazy val gatlingReleasePublishStep = settingKey[ReleaseStep]("releaseStep to execute")
   }
 
   import autoImport._

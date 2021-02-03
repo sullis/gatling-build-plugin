@@ -18,9 +18,11 @@ package io.gatling.build
 
 import io.gatling.build.license._
 
+import _root_.io.gatling.build.GatlingReleasePlugin.autoImport.gatlingReleasePublishStep
 import de.heikoseeberger.sbtheader.AutomateHeaderPlugin
 import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport.headerLicense
 import sbt._
+import sbtrelease.ReleasePlugin.autoImport.{ releasePublishArtifactsAction, ReleaseStep }
 
 object GatlingCorpPlugin extends AutoPlugin {
   override def requires =
@@ -33,6 +35,13 @@ object GatlingCorpPlugin extends AutoPlugin {
       AutomateHeaderPlugin
 
   override def projectSettings: Seq[Def.Setting[_]] = Seq(
-    headerLicense := AllRightsReservedLicense
+    headerLicense := AllRightsReservedLicense,
+    releasePublishArtifactsAction := sbt.Keys.publish.value,
+    gatlingReleasePublishStep := publishStep
   )
+
+  val publishStep: ReleaseStep = ReleaseStep { state: State =>
+    val extracted = Project.extract(state)
+    extracted.runAggregated(releasePublishArtifactsAction in Global in extracted.currentRef, state)
+  }
 }

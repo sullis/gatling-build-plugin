@@ -16,7 +16,7 @@
 
 package io.gatling.build
 
-import sbt._
+import sbt.{ Def, _ }
 import sbt.Keys._
 
 object GatlingBasicInfoPlugin extends AutoPlugin {
@@ -39,17 +39,20 @@ object GatlingBasicInfoPlugin extends AutoPlugin {
       organization := "io.gatling",
       organizationName := "Gatling Corp",
       organizationHomepage := Some(url("https://gatling.io")),
-      scmInfo := Some(
+      scmInfo := githubPath.?.value.map(githubPath =>
         ScmInfo(
-          url(s"https://github.com/${githubPath.value}"),
-          s"scm:git:https://github.com/${githubPath.value}.git",
-          s"scm:git:git@github.com/${githubPath.value}.git"
+          url(s"https://github.com/$githubPath"),
+          s"scm:git:https://github.com/$githubPath.git",
+          s"scm:git:git@github.com/$githubPath.git"
         )
       ),
       startYear := Some(2011),
-      gatlingDevelopers := Seq.empty,
       pomExtra := developersXml(gatlingDevelopers.value)
     )
+
+  override def globalSettings: Seq[Def.Setting[_]] = Seq(
+    gatlingDevelopers := Seq.empty
+  )
 
   private def developersXml(devs: Seq[GatlingDeveloper]) = {
     <developers>

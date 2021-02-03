@@ -16,6 +16,8 @@
 
 package io.gatling.build
 
+import io.gatling.build.GatlingBasicInfoPlugin.autoImport.githubPath
+import io.gatling.build.GatlingReleasePlugin.autoImport.gatlingReleasePublishStep
 import io.gatling.build.license._
 import io.gatling.build.publish.GatlingVersion
 
@@ -24,9 +26,10 @@ import de.heikoseeberger.sbtheader.AutomateHeaderPlugin
 import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport.headerLicense
 import sbt._
 import sbt.Keys._
-import sbtrelease.ReleasePlugin.autoImport.{ releasePublishArtifactsAction, releaseStepCommandAndRemaining }
+import sbtrelease.ReleasePlugin.autoImport.{ releasePublishArtifactsAction, releaseStepCommandAndRemaining, ReleaseStep }
+import sbtrelease.ReleaseStateTransformations.reapply
 import xerial.sbt.Sonatype
-import xerial.sbt.Sonatype.autoImport.sonatypePublishTo
+import xerial.sbt.Sonatype.autoImport.{ sonatypePublishTo, sonatypeSessionName, sonatypeTargetRepositoryProfile }
 
 object GatlingOssPlugin extends AutoPlugin {
   override def requires =
@@ -49,10 +52,12 @@ object GatlingOssPlugin extends AutoPlugin {
         sonatypePublishTo.value
       }
     },
-    releasePublishArtifactsAction := publishArtifactsAction.value
+    sonatypeSessionName := s"[sbt-sonatype] ${githubPath.value} ${version.value}",
+    releasePublishArtifactsAction := publishSigned.value,
+    gatlingReleasePublishStep := publishStep
   )
 
-  val publishArtifactsAction = Def.taskDyn {
+  val publishStep: ReleaseStep = ReleaseStep { state: State =>
     /*
      * Issues:
      *  - sbt-sonatype plugin only declares commands (not tasks)
@@ -63,26 +68,31 @@ object GatlingOssPlugin extends AutoPlugin {
      *  - inject it to the state needed by publishSigned task
      *  - call sonatypeClose command with full state from sonatypeOpen
      */
-    val startState = state.value
-    val log = streams.value.log
-    Def.task {
-      log.info(s"Opening sonatype staging")
-      val sonatypeOpenState = releaseStepCommandAndRemaining("sonatypeOpen")(startState)
-      log.info("compile, package, sign and publish")
-      val extracted = Project.extract(startState)
-      val ref = extracted.get(thisProjectRef)
-      Def.unit(
-        extracted.runAggregated(
-          publishSigned in Global in ref,
-          startState.appendWithSession(
-            Seq(
-              sonatypePublishTo := sonatypeOpenState.getSetting(sonatypePublishTo).get
-            )
-          )
-        )
+    state.log.info(s"Opening sonatype staging")
+    val sonatypeOpenState = releaseStepCommandAndRemaining("sonatypeOpen")(state)
+    val sonatypeTargetRepositoryProfileValue = sonatypeOpenState.getSetting(sonatypeTargetRepositoryProfile).get
+
+    val startStateWithSonatypeConf = reapply(
+      Project.extract(state).currentProject.referenced.flatMap { ref =>
+        ref / sonatypeTargetRepositoryProfile := sonatypeTargetRepositoryProfileValue
+      } ++
+        Seq(
+          sonatypeTargetRepositoryProfile := sonatypeTargetRepositoryProfileValue
+        ),
+      state
+    )
+
+    state.log.info("compile, package, sign and publish")
+    val endState = {
+      val extracted = Project.extract(startStateWithSonatypeConf)
+      extracted.runAggregated(
+        releasePublishArtifactsAction in Global in extracted.currentRef,
+        startStateWithSonatypeConf
       )
-      log.info("Closing sonatype staging")
-      Def.unit(releaseStepCommandAndRemaining("sonatypeClose")(sonatypeOpenState))
     }
+
+    state.log.info("Closing sonatype staging")
+    Def.unit(releaseStepCommandAndRemaining("sonatypeClose")(sonatypeOpenState))
+    endState
   }
 }

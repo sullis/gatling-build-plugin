@@ -35,8 +35,7 @@ object GatlingReleaseProcess {
     if (!skipSnapshotDepsCheck.value) checkSnapshotDependencies else noop
   }
   private def publishStep = Def.setting {
-    // releaseP
-    ReleaseStep(releaseStepTaskAggregated(releasePublishArtifactsAction in Global in thisProjectRef.value))
+    ReleaseStep(releaseStepTask(releasePublishArtifactsAction in Global in thisProjectRef.value))
   }
 
   case object Minor extends GatlingReleaseProcess {
@@ -54,7 +53,7 @@ object GatlingReleaseProcess {
         setReleaseVersion,
         commitReleaseVersion,
         tagRelease,
-        publishStep.value,
+        gatlingReleasePublishStep.value,
         writeCurrentVersion,
         pushChanges,
         createBugfixBranch,
@@ -80,7 +79,7 @@ object GatlingReleaseProcess {
         setReleaseVersion,
         commitReleaseVersion,
         tagRelease,
-        publishStep.value,
+        gatlingReleasePublishStep.value,
         writeCurrentVersion,
         pushChanges,
         setNextVersion,
@@ -103,7 +102,7 @@ object GatlingReleaseProcess {
         runTest,
         setReleaseVersion,
         tagRelease,
-        publishStep.value,
+        gatlingReleasePublishStep.value,
         writeCurrentVersion,
         pushChanges,
         setNextVersion
