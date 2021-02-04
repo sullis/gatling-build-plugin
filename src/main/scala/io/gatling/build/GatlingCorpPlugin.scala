@@ -26,7 +26,7 @@ import io.gatling.build.release.GatlingReleasePlugin
 
 import de.heikoseeberger.sbtheader.AutomateHeaderPlugin
 import de.heikoseeberger.sbtheader.HeaderPlugin.autoImport.headerLicense
-import sbtrelease.ReleasePlugin.autoImport.{ releasePublishArtifactsAction, ReleaseStep }
+import sbtrelease.ReleasePlugin.autoImport.releasePublishArtifactsAction
 
 import sbt._
 

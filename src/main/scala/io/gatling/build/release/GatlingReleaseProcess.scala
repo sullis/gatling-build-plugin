@@ -23,28 +23,24 @@ import sbtrelease.ReleasePlugin.autoImport._
 import sbtrelease.ReleaseStateTransformations._
 
 import sbt._
-import sbt.Keys._
 
 sealed trait GatlingReleaseProcess {
-  def releaseSteps: Def.Initialize[Seq[ReleaseStep]]
-  def releaseVersion: String => String = gatlingVersion(_.withoutQualifier)
-  def releaseNextVersion: String => String
+  val releaseSteps: Def.Initialize[Seq[ReleaseStep]]
+  val releaseVersion: String => String = gatlingVersion(_.withoutQualifier)
+  val releaseNextVersion: String => String
 }
 
 object GatlingReleaseProcess {
   private def checkSnapshotDeps = Def.setting {
     if (!skipSnapshotDepsCheck.value) checkSnapshotDependencies else noop
   }
-  private def publishStep = Def.setting {
-    ReleaseStep(releaseStepTask(releasePublishArtifactsAction in Global in thisProjectRef.value))
-  }
 
   case object Minor extends GatlingReleaseProcess {
-    override def releaseNextVersion: String => String = gatlingVersion(_.bumpMinor.asSnapshot)
+    override val releaseNextVersion: String => String = gatlingVersion(_.bumpMinor.asSnapshot)
 
     override def toString: String = "minor"
 
-    override def releaseSteps: Def.Initialize[Seq[ReleaseStep]] = Def.setting {
+    override val releaseSteps: Def.Initialize[Seq[ReleaseStep]] = Def.setting {
       Seq(
         checkSnapshotDeps.value,
         checkMinorVersion,
@@ -66,11 +62,11 @@ object GatlingReleaseProcess {
   }
 
   case object Patch extends GatlingReleaseProcess {
-    override def releaseNextVersion: String => String = gatlingVersion(_.bumpPatch.asSnapshot)
+    override val releaseNextVersion: String => String = gatlingVersion(_.bumpPatch.asSnapshot)
 
     override def toString: String = "patch"
 
-    override def releaseSteps: Def.Initialize[Seq[ReleaseStep]] = Def.setting {
+    override val releaseSteps: Def.Initialize[Seq[ReleaseStep]] = Def.setting {
       Seq(
         checkSnapshotDeps.value,
         checkPatchVersion,
@@ -91,11 +87,11 @@ object GatlingReleaseProcess {
   }
 
   case object Milestone extends GatlingReleaseProcess {
-    override def releaseVersion: String => String = gatlingVersion(_.asMilestone)
-    override def releaseNextVersion: String => String = gatlingVersion(_.asSnapshot)
+    override val releaseVersion: String => String = gatlingVersion(_.asMilestone)
+    override val releaseNextVersion: String => String = gatlingVersion(_.asSnapshot)
     override def toString: String = "milestone"
 
-    override def releaseSteps: Def.Initialize[Seq[ReleaseStep]] = Def.setting {
+    override val releaseSteps: Def.Initialize[Seq[ReleaseStep]] = Def.setting {
       Seq(
         checkSnapshotDeps.value,
         inquireVersions,
